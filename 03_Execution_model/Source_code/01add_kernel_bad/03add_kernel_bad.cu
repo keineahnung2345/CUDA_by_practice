@@ -46,9 +46,16 @@ void onHost()
   	onDevice(h_a, h_b, h_c);
 
   	for(int i =0; i< ARRAY_SIZE; i++){
-  		printf("%i \n",h_a[0]);
-      assert(h_a[i] + h_b[i] == h_c[i]);
+  		printf("%i + % i = %i? \n", h_a[i], h_b[i], h_c[i]);
+      //assert(h_a[i] + h_b[i] == h_c[i]);
 	  }
+	/*
+	1 +  1 = 0? 
+	1 +  1 = 0? 
+	1 +  1 = 0? 
+	1 +  1 = 0? 
+	1 +  1 = 0?
+	*/
 
   	printf("-: successful execution :-\n");
 
