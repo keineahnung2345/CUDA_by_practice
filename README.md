@@ -12,7 +12,7 @@ This is an introduction to learn CUDA. I used a lot of references to learn the b
 Details
 -------------
 
-####Description of the exercise
+#### Description of the exercise
 
 During the presentation, there are some examples and practices. For the examples, it is just necessary to do what is described in the **Running the scripts** section. For the practices, it is required to implement some sections of the code.
 
@@ -29,7 +29,7 @@ int* add(int *a, int *b, int *result, int N){
 }
 ```
 
-####Running the scripts
+#### Running the scripts
 
 
 **NOTE**: All the codes have been tested in linux environments. The command **nvcc** is used to compile CUDA source files, it is similar to the command **gcc** used to compile *C* source codes.
@@ -61,17 +61,17 @@ Installation of CUDA
 References
 -------------
 
-####Books
+#### Books
 >* **CUDA by Example: An Introduction to General-Purpose GPU Programming**. Jason Sanders, Edward Kandrot
 >* **CUDA Application Design and Development**. Rob Farber
 >* **CUDA Programming: A Developer's Guide to Parallel Computing with GPUs (Applications of GPU Computing Series)**. Shane Cook
 >* **Programming Massively Parallel Processors, Second Edition: A Hands- on Approach**. David B. Kirk , Wen-mei W. Hwu
 
-####Courses
+#### Courses
 >* [Udacity:](https://www.udacity.com/course/cs344) Introduction to Parallel Programming
 >* [Coursera:](https://www.coursera.org/course/hetero) Heterogeneous Parallel Programming
 
-####Websites
+#### Websites
 
 >* [Dr. Dobbs: ](http://www.drdobbs.com/parallel/cuda-supercomputing-for-the-masses-part/207200659) CUDA, Supercomputing for the Masses
 >* [Livermore Computing:](https://computing.llnl.gov/?set=training&page=index) High performance computing training
