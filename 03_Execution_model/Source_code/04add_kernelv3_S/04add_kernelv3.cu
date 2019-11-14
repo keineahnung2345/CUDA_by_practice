@@ -14,6 +14,13 @@ const int ARRAY_BYTES = ARRAY_SIZE * sizeof(int);
 // number of threads per block in x -> blockDim.x
 // number of blocks per grid in x   -> gridDim.x
 
+long get_time(){
+    std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()
+    );
+    return ms.count();
+}
+
 //kernel 
 __global__ void addKernel(  int  *d_a, int *d_b, int *d_result){
    
@@ -51,7 +58,7 @@ __global__ void addKernel3(  int  *d_a, int *d_b, int *d_result){
 
 void onDevice(int  *h_a, int *h_b, int *h_result){
 
-  int *d_a, *d_b, *d_result; 
+  int *d_a, *d_b, *d_result;
 
    //allocate memory on the device
   cudaMalloc( (void**)&d_a, ARRAY_BYTES );
@@ -69,10 +76,62 @@ void onDevice(int  *h_a, int *h_b, int *h_result){
   cudaMemcpy( h_result, d_result, ARRAY_BYTES, cudaMemcpyDeviceToHost );
 
     // check the results
-  for (int i=0; i<ARRAY_SIZE; i++) {
-    assert( h_a[i] + h_b[i] == h_result[i] );
-    //printf("%i\n", h_result[i] );
-  }
+//  for (int i=0; i<ARRAY_SIZE; i++) {
+//    assert( h_a[i] + h_b[i] == h_result[i] );
+//    //printf("%i\n", h_result[i] );
+//  }
+
+    // free device memory
+  cudaFree( d_a );
+  cudaFree( d_b );
+  cudaFree( d_result );
+
+}
+
+void onDevice2(int  *h_a, int *h_b, int *h_result){
+
+  int *d_a, *d_b, *d_result;
+
+   //allocate memory on the device
+  cudaMalloc( (void**)&d_a, ARRAY_BYTES );
+  cudaMalloc( (void**)&d_b, ARRAY_BYTES );
+  cudaMalloc( (void**)&d_result, ARRAY_BYTES );
+
+    //copythe arrays 'a' and 'b' to the device
+  cudaMemcpy( d_a, h_a, ARRAY_BYTES, cudaMemcpyHostToDevice );
+  cudaMemcpy( d_b, h_b, ARRAY_BYTES, cudaMemcpyHostToDevice );
+
+  //run the kernel
+  addKernel2<<<BLOCKS,THREADS>>>( d_a, d_b, d_result);
+
+    // copy the array 'result' back from the device to the CPU
+  cudaMemcpy( h_result, d_result, ARRAY_BYTES, cudaMemcpyDeviceToHost );
+
+    // check the results
+//  for (int i=0; i<ARRAY_SIZE; i++) {
+//    assert( h_a[i] + h_b[i] == h_result[i] );
+//    //printf("%i\n", h_result[i] );
+//  }
+
+    // free device memory
+  cudaFree( d_a );
+  cudaFree( d_b );
+  cudaFree( d_result );
+
+}
+
+void onDevice3(int  *h_a, int *h_b, int *h_result){
+
+  int *d_a, *d_b, *d_result;
+
+   //allocate memory on the device
+  cudaMalloc( (void**)&d_a, ARRAY_BYTES );
+  cudaMalloc( (void**)&d_b, ARRAY_BYTES );
+  cudaMalloc( (void**)&d_result, ARRAY_BYTES );
+
+    //copythe arrays 'a' and 'b' to the device
+  cudaMemcpy( d_a, h_a, ARRAY_BYTES, cudaMemcpyHostToDevice );
+  cudaMemcpy( d_b, h_b, ARRAY_BYTES, cudaMemcpyHostToDevice );
 
   //run the kernel
   addKernel3<<<BLOCKS,THREADS>>>( d_a, d_b, d_result);
@@ -81,17 +140,15 @@ void onDevice(int  *h_a, int *h_b, int *h_result){
   cudaMemcpy( h_result, d_result, ARRAY_BYTES, cudaMemcpyDeviceToHost );
 
     // check the results
-  for (int i=0; i<ARRAY_SIZE; i++) {
-    assert( h_a[i] + h_b[i] == h_result[i] );
-    //printf("%i\n", h_result[i] );
-  }
+//  for (int i=0; i<ARRAY_SIZE; i++) {
+//    assert( h_a[i] + h_b[i] == h_result[i] );
+//    //printf("%i\n", h_result[i] );
+//  }
 
     // free device memory
   cudaFree( d_a );
   cudaFree( d_b );
   cudaFree( d_result );
-    
-
 
 }
 
@@ -111,7 +168,17 @@ void onHost(){
     h_result[i]=0;
   }
     
+  long start = get_time();
   onDevice(h_a, h_b, h_result);
+  printf("%ld\n", get_time() - start); //92
+
+  start = get_time();
+  onDevice2(h_a, h_b, h_result);
+  printf("%ld\n", get_time() - start); //0
+
+  start = get_time();
+  onDevice3(h_a, h_b, h_result);
+  printf("%ld\n", get_time() - start); //0
 
   printf("-: successful execution :-\n");
 
