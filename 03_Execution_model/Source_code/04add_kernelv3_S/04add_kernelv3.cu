@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <cuda.h>
-
+#include "GpuTimer.h"
 
 #define ARRAY_SIZE 1000
 #define THREADS 3
@@ -13,13 +13,6 @@ const int ARRAY_BYTES = ARRAY_SIZE * sizeof(int);
 // index of the blocks in x         -> blockIdx.x
 // number of threads per block in x -> blockDim.x
 // number of blocks per grid in x   -> gridDim.x
-
-long get_time(){
-    std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::system_clock::now().time_since_epoch()
-    );
-    return ms.count();
-}
 
 //kernel 
 __global__ void addKernel(  int  *d_a, int *d_b, int *d_result){
@@ -70,7 +63,11 @@ void onDevice(int  *h_a, int *h_b, int *h_result){
   cudaMemcpy( d_b, h_b, ARRAY_BYTES, cudaMemcpyHostToDevice );
 
   //run the kernel
+  GpuTimer timer;
+  timer.Start();
   addKernel<<<BLOCKS,THREADS>>>( d_a, d_b, d_result);
+  timer.Stop();
+  printf( "Time :  %f ms\n", timer.Elapsed() );
 
     // copy the array 'result' back from the device to the CPU
   cudaMemcpy( h_result, d_result, ARRAY_BYTES, cudaMemcpyDeviceToHost );
@@ -102,7 +99,11 @@ void onDevice2(int  *h_a, int *h_b, int *h_result){
   cudaMemcpy( d_b, h_b, ARRAY_BYTES, cudaMemcpyHostToDevice );
 
   //run the kernel
+  GpuTimer timer;
+  timer.Start();
   addKernel2<<<BLOCKS,THREADS>>>( d_a, d_b, d_result);
+  timer.Stop();
+  printf( "Time :  %f ms\n", timer.Elapsed() );
 
     // copy the array 'result' back from the device to the CPU
   cudaMemcpy( h_result, d_result, ARRAY_BYTES, cudaMemcpyDeviceToHost );
@@ -134,7 +135,11 @@ void onDevice3(int  *h_a, int *h_b, int *h_result){
   cudaMemcpy( d_b, h_b, ARRAY_BYTES, cudaMemcpyHostToDevice );
 
   //run the kernel
+  GpuTimer timer;
+  timer.Start();
   addKernel3<<<BLOCKS,THREADS>>>( d_a, d_b, d_result);
+  timer.Stop();
+  printf( "Time :  %f ms\n", timer.Elapsed() );
 
     // copy the array 'result' back from the device to the CPU
   cudaMemcpy( h_result, d_result, ARRAY_BYTES, cudaMemcpyDeviceToHost );
@@ -167,18 +172,12 @@ void onHost(){
         h_b[i] = i * i;
     h_result[i]=0;
   }
-    
-  long start = get_time();
+  
   onDevice(h_a, h_b, h_result);
-  printf("%ld\n", get_time() - start); //92
 
-  start = get_time();
   onDevice2(h_a, h_b, h_result);
-  printf("%ld\n", get_time() - start); //0
-
-  start = get_time();
+    
   onDevice3(h_a, h_b, h_result);
-  printf("%ld\n", get_time() - start); //0
 
   printf("-: successful execution :-\n");
 
@@ -193,3 +192,8 @@ int main(){
   return 0;
 }
 
+/*
+Time :  0.017408 ms
+Time :  0.058208 ms
+Time :  0.013152 ms
+*/
