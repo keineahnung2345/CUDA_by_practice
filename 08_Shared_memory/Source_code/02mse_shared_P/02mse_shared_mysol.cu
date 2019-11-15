@@ -1,6 +1,7 @@
 #include "Error.h"
 #include "Vector.h"
 #include "GpuTimer.h"
+#include <assert.h>
 
 #define N   16
 #define BLOCK_SIZE 2
@@ -139,8 +140,8 @@ void test(){
     }
     printf("%d\n", h_se);
 
-
-
+    assert(d_se == h_se);
+    
     printf("-: successful execution :-\n");
 
     free(h_a.elements);
