@@ -49,6 +49,7 @@ __global__ void dotKernel( Vector<float> d_a, Vector<float> d_b, Vector<float> d
     //after the loop, all the value the block has calculated has be summed to cache[0]
 
     if (cacheIndex == 0)
+        //use blockIdx.x because d_c is an array of size blockDim.x
         d_c.setElement(blockIdx.x, cache[0]);
 
 }
