@@ -22,3 +22,7 @@ void onDevice(Vector<int> d_a, Vector<int> d_b, Vector<int> d_c){
 ```
 
 The size of dynamic shared memory `s` is specified using optional third execution configuration parameter.
+
+## shared memory not faster than global memory!?
+
+Ref: [CUDA: Is coalesced global memory access faster than shared memory? Also, does allocating a large shared memory array slow down the program?](https://stackoverflow.com/questions/9196134/cuda-is-coalesced-global-memory-access-faster-than-shared-memory-also-does-al/9196695)
