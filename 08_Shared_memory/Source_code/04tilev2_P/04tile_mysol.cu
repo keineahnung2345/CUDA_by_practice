@@ -29,6 +29,8 @@ __global__ void tileKernelv2(Vector<int> d_in, Vector<int> d_out){
     s[tix * 5 + 3] = d_in.getElement(i+1);
     s[tix * 5 + 4] = d_in.getElement(i+2);
 
+    __syncthreads();
+
     int tmp = 0;
     tmp = (s[tix * 5 + 0] + s[tix * 5 + 1] + s[tix * 5 + 2] + s[tix * 5 + 3] + s[tix * 5 + 4])/5.0f;
     d_out.elements[i] = tmp;
