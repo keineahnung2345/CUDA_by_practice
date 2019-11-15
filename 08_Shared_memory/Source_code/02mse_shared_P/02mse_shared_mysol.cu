@@ -126,21 +126,22 @@ void test(){
 
     // call device configuration
     onDevice(h_a, h_b, h_c);
-
      // verify that the GPU did the work we requested
-    int d_se = 0, h_se = 0;
+    float d_mse = 0, h_mse = 0;
     for (int i=0; i<4; i++) {
-            d_se += h_c.getElement(i);
+            d_mse += h_c.getElement(i);
             printf( " [%i] = %f \n", i, h_c.getElement(i) );
     }
-    printf("%d\n", d_se);
+    d_mse /= N;
+    printf("mse from device: %f\n", d_mse);
 
     for (int i=0; i<N; i++) {
-            h_se += POW(h_a.getElement(i) - h_b.getElement(i));
+            h_mse += POW(h_a.getElement(i) - h_b.getElement(i));
     }
-    printf("%d\n", h_se);
+    h_mse /= N;
+    printf("mse from host: %f\n", h_mse);
 
-    assert(d_se == h_se);
+    assert(d_mse == h_mse);
     
     printf("-: successful execution :-\n");
 
