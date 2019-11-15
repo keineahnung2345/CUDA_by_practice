@@ -5,3 +5,20 @@ Ref: [C/C++ 中的 static, extern 的變數](https://medium.com/@alan81920/c-c-%
 
 If we want to notify the compiler that a variable exists, but don't want to decalre it in current file, we can use `extern` keyword.
 
+## dynamic shared memory
+```cpp
+__global__ void dynamicReverseKernel(Vector<int> d_a)
+{ 
+  // -* note the empty brackets and the use of the extern specifier *-
+  extern __shared__ int s[];
+  //...
+}
+
+void onDevice(Vector<int> d_a, Vector<int> d_b, Vector<int> d_c){
+  //...
+  dynamicReverseKernel<<<1,N,N*sizeof(int)>>>(d_d);
+  //...
+}
+```
+
+The size of dynamic shared memory `s` is specified using optional third execution configuration parameter.
