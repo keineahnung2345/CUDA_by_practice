@@ -10,11 +10,13 @@ const int ARRAY_BYTES = N * sizeof(float);
 const int P_ARRAY_BYTES = BLOCKS * sizeof(float);
 
 __global__ void dotKernel( Vector<float> d_a, Vector<float> d_b, Vector<float> d_c ){
-
+    //shared memory's size is the same as the block's size
     __shared__ float cache[THREADS];
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
     int cacheIndex = threadIdx.x;
 
+    // a kernel function is executed is each block 
+    //the block is responsible for range(threadIdx.x, N, blockDim.x * gridDim.x)
     float   temp = 0;
     while (tid < N) {
         temp += d_a.getElement(tid) * d_b.getElement(tid);
@@ -25,18 +27,26 @@ __global__ void dotKernel( Vector<float> d_a, Vector<float> d_b, Vector<float> d
     cache[cacheIndex] = temp;
     
     // synchronize threads in this block
-    __syncthreads();
+    //__syncthreads();
 
     // for reductions, threadsPerBlock must be a power of 2
     // because of the following code
+    // a kernel function is executed is each block, 
+    // and here i is the half width of a block
     int i = blockDim.x/2;
     while (i != 0) {
+        //without __syncthreads(), the program can still run, but the result will change
         __syncthreads();
         if (cacheIndex < i){
+            //cacheIndex ranges from 0 to i-1
+            //add cache[i:2*i] to cache[0:i]
+            //we can image it as split the vector cache[:2*i] into half,
+            //and add the later half to former half
             cache[cacheIndex] += cache[cacheIndex + i];
         }
         i /= 2;
     }
+    //after the loop, all the value the block has calculated has be summed to cache[0]
 
     if (cacheIndex == 0)
         d_c.setElement(blockIdx.x, cache[0]);
