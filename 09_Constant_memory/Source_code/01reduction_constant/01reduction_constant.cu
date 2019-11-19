@@ -1,10 +1,15 @@
 #include "Error.h"
 #include "GpuTimer.h"
 #include "Vector.h"
+#include <assert.h>
 
 //check the constant memory amount
 
-#define N   (16 * 1024)
+//use too much constant memory, available constant memory size on GeForce GTX 1080 is 65536 bytes
+//requiring 16 * 1024 * 4(float) * 2(d_a and d_b) = 2 ^ 16 bytes = 65536 bytes
+//ptxas error   : File uses too much global constant data (0x20000 bytes, 0x10000 max)
+//#define N   (16 * 1024)
+#define N   (8 * 1024)
 #define THREADS 256
 #define BLOCKS 32
 
@@ -18,12 +23,14 @@ __constant__  float d_b[N];
 __global__ void dotKernel( Vector<float> d_c ){
 
     __shared__ float cache[THREADS];
+    //used to index thread in a block
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
     int cacheIndex = threadIdx.x;
 
     float   temp = 0;
     while (tid < N) {
         temp += d_a[tid] * d_b[tid];
+        //jump to next grid
         tid += blockDim.x * gridDim.x;
     }
     
@@ -32,6 +39,7 @@ __global__ void dotKernel( Vector<float> d_c ){
     
     // synchronize threads in this block
     __syncthreads();
+    //now the array "cache" is ready to be read
 
     // for reductions, threadsPerBlock must be a power of 2
     // because of the following code
@@ -64,6 +72,7 @@ void onDevice( Vector<float> h_a, Vector<float> h_b, Vector<float> h_c ){
     int i;
     for (i=0; i < 2; i++){
     // allocate  memory on the GPU
+    //Note it's not cudaMemcpy(x,x,x,cudaMemcpyHostToDevice)!
     HANDLER_ERROR_ERR(cudaMemcpyToSymbol( d_a, h_a.elements, ARRAY_BYTES));
     HANDLER_ERROR_ERR(cudaMemcpyToSymbol( d_b, h_b.elements, ARRAY_BYTES));
     HANDLER_ERROR_ERR(cudaMalloc((void**)&d_c.elements, P_ARRAY_BYTES));
@@ -111,14 +120,23 @@ void test(){
     // call device configuration
     onDevice(h_a, h_b, h_c);
 
-    float finalValue=0.0;
+    float d_dot_result = 0.0;
 
      // verify that the GPU did the work we requested
     for (int i=0; i<BLOCKS; i++) {
-          finalValue += h_c.getElement(i);
+          d_dot_result += h_c.getElement(i);
+    }
+    
+    printf( "Dot result from device = %f \n", d_dot_result);
+
+    float h_dot_result = 0.0;
+    for (int i=0; i<N; i++) {
+          h_dot_result += h_a.getElement(i) * h_b.getElement(i);
     }
 
-    printf( "Dot result = %f \n", finalValue);
+    printf( "Dot result from host = %f \n", h_dot_result);
+
+    assert(d_dot_result == h_dot_result);
 
     printf("-: successful execution :-\n");
 
