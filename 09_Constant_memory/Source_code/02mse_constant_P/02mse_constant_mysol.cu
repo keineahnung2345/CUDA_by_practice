@@ -128,13 +128,13 @@ void test(){
             printf( " [%i] = %f \n", i, h_c.getElement(i) );
             d_mse += h_c.getElement(i);
     }
-    printf("MSE from device: %f\n", d_mse/(N*N));
+    printf("MSE from device: %f\n", d_mse/N);
 
     float h_mse = 0;
     for (int i=0; i<N; i++) {
             h_mse += POW(h_a.getElement(i) - h_b.getElement(i));
     }
-    printf("MSE from host: %f\n", h_mse/(N*N));
+    printf("MSE from host: %f\n", h_mse/N);
 
     assert(d_mse == h_mse);
 
