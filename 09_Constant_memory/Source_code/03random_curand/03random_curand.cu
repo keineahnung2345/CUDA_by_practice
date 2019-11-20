@@ -29,11 +29,16 @@ int randomNumbersGenerator(int n){
  
  
   /* Set seed 1234ULL = unsigned long long */
+  //srand48, lrand48: linux functions
+  //srand48: initialization function, should be called before lrand48
+  //lrand48: return nonnegative long int uniformly distributed between 0 and 2^31
+  //the result is not deterministic
   srand48( time(NULL) );
   HANDLER_CURAND(curandSetPseudoRandomGeneratorSeed(gen, lrand48() ));
 
   /* Set seed 1234ULL = unsigned long long 
   Use this to generate the same random numbers*/
+  //the result is deterministic
   //HANDLER_CURAND(curandSetPseudoRandomGeneratorSeed(gen, 1234ULL));
  
   /* Generate n floats on device */
