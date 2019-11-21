@@ -18,3 +18,6 @@ Ref:
 ```
 Atomic operations are performed directly inside the memory controller, so they are a lot closer to and tighter coupled with L2 cache and global memory.
 ```
+
+## cudaDeviceProp::multiProcessorCount
+[cudaDeviceProp::multiProcessorCount](https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_13e36d9d236f97095ef2b496cd2f98121)
