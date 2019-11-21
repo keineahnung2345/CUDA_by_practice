@@ -49,7 +49,8 @@ void onDevice(Vector< int> h_a, Vector<int> h_b){
     // copy data from CPU the GPU
     HANDLER_ERROR_ERR(cudaMemcpy(d_a.elements, h_a.elements, ARRAY_BYTES, cudaMemcpyHostToDevice));
     
-    incrementKernel<<<100,1024>>>( d_a );
+    //incrementKernel<<<100,1024>>>( d_a );
+    incrementKernel<<<100,512>>>( d_a );
     HANDLER_ERROR_MSG("kernel panic!!!");
 
     HANDLER_ERROR_ERR( cudaMemcpy( h_a.elements, d_a.elements, ARRAY_BYTES, cudaMemcpyDeviceToHost ) );
