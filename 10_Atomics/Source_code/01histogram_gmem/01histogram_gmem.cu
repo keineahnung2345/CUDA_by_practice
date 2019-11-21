@@ -129,3 +129,9 @@ int main( void ) {
 
     return 0;
 }
+
+/*
+GPU Time :  76.952286 ms
+CPU Time :  156.804993 ms
+-: successful execution :-
+*/
