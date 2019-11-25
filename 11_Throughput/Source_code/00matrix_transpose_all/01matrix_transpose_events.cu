@@ -318,3 +318,14 @@ int main(){
 	onHost();
 }
 
+/*
+Execution result:
+Time Host:  11.495000 ms
+Time Device serial:  151.918427 ms
+Time Device threads:  1.148576 ms
+Time Device threads and blocks:  0.082432 ms
+Time Device tile:  0.038048 ms
+Time Device tile-padded:  0.037344 ms
+Time Device final:  0.038912 ms
+-: successful execution :-
+*/
