@@ -27,6 +27,7 @@ void compareResults(Matrix<int> h_a, Matrix<int> h_b){
 __global__ void transposedMatrixKernel_threads_blocks(Matrix<int> d_a, Matrix<int> d_b){
 
     
+        //both i and j are range from 0 to N-1
 	int i = threadIdx.x + blockDim.x * blockIdx.x;
 	int j = threadIdx.y + blockDim.y * blockIdx.y;
 
@@ -41,6 +42,7 @@ __global__ void transposedMatrixKernel_threads(Matrix<int> d_a, Matrix<int> d_b,
 	int i = threadIdx.x;
 	int j = 0;
 
+        //i th thread is responsible for the computation of [i:N:THREADS]
 	while (i < N){
 		while( j < N ){
 			d_b.setElement( i, j, d_a.getElement(j, i) );
@@ -118,7 +120,7 @@ void onDevice( Matrix<int> h_a, Matrix<int> h_b ){
 	HANDLER_ERROR_MSG("kernel panic!!!");
    	timer.Stop(); 
     printf( "Time Device serial:  %f ms\n", timer.Elapsed() );
-    bandwith(N, timer.Elapsed());
+    bandwidth(N, timer.Elapsed());
     // copy data back from the GPU to the CPU
 	HANDLER_ERROR_ERR(cudaMemcpy(h_b.elements, d_b.elements, ARRAY_BYTES, cudaMemcpyDeviceToHost));	
 	compareResults(h_a, h_b);
@@ -131,7 +133,7 @@ void onDevice( Matrix<int> h_a, Matrix<int> h_b ){
 	transposedMatrixKernel_threads<<<1,THREADS>>>( d_a, d_b,  THREADS);
    	timer.Stop();
     printf( "Time Device threads:  %f ms\n", timer.Elapsed() );
-   	bandwith(N, timer.Elapsed()); 
+   	bandwidth(N, timer.Elapsed()); 
     // copy data back from the GPU to the CPU
 	HANDLER_ERROR_ERR(cudaMemcpy(h_b.elements, d_b.elements, ARRAY_BYTES, cudaMemcpyDeviceToHost));	
 	compareResults(h_a, h_b);
@@ -145,7 +147,7 @@ void onDevice( Matrix<int> h_a, Matrix<int> h_b ){
     HANDLER_ERROR_MSG("kernel panic!!!");
    	timer.Stop();  	
     printf( "Time Device threads and blocks:  %f ms\n", timer.Elapsed() );
-    bandwith(N, timer.Elapsed()); 
+    bandwidth(N, timer.Elapsed()); 
     // copy data back from the GPU to the CPU
 	HANDLER_ERROR_ERR(cudaMemcpy(h_b.elements, d_b.elements, ARRAY_BYTES, cudaMemcpyDeviceToHost));	
 	compareResults(h_a, h_b);
@@ -211,4 +213,3 @@ int main(){
 
 	onHost();
 }
-
