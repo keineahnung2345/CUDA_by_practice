@@ -213,3 +213,27 @@ int main(){
 
 	onHost();
 }
+
+/*
+output before change the formulas of tbw and efbw:
+Time Host:  18.177000 ms
+Time Device serial:  155.608353 ms
+TBw = 32.032 GB/s, EBw = 0.005 GB/s, RAM Utilization = 0.02 %  
+Time Device threads:  1.151360 ms
+TBw = 32.032 GB/s, EBw = 0.729 GB/s, RAM Utilization = 2.27 %  
+Time Device threads and blocks:  0.087968 ms
+TBw = 32.032 GB/s, EBw = 9.536 GB/s, RAM Utilization = 29.77 %  
+-: successful execution :-
+*/
+
+/*
+output after change the formulas of tbw and efbw:
+Time Host:  9.745000 ms
+Time Device serial:  151.362274 ms
+TBw = 320.320 GB/s, EBw = 0.001 GB/s, RAM Utilization = 0.00 %  
+Time Device threads:  1.207104 ms
+TBw = 320.320 GB/s, EBw = 0.069 GB/s, RAM Utilization = 0.02 %  
+Time Device threads and blocks:  0.090432 ms
+TBw = 320.320 GB/s, EBw = 0.928 GB/s, RAM Utilization = 0.29 %  
+-: successful execution :-
+*/
