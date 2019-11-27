@@ -244,3 +244,15 @@ int main(){
 	onHost();
 }
 
+/*
+Time Host:  10.821000 ms
+Time Device serial:  149.752258 ms
+TBw = 320.320 GB/s, EBw = 0.056 GB/s, RAM Utilization = 0.02 %  
+Time Device threads:  1.151488 ms
+TBw = 320.320 GB/s, EBw = 7.285 GB/s, RAM Utilization = 2.27 %  
+Time Device threads and blocks:  0.050976 ms
+TBw = 320.320 GB/s, EBw = 164.560 GB/s, RAM Utilization = 51.37 %  
+Time Device tile:  0.043232 ms
+TBw = 320.320 GB/s, EBw = 194.037 GB/s, RAM Utilization = 60.58 %  
+-: successful execution :-
+*/
