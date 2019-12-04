@@ -73,7 +73,8 @@ void onDevice(Vector<float> h_a, Vector<float> h_b)
 
 	HANDLER_ERROR_MSG("kernel panic!!!"); 	
 	
-	cudaThreadSynchronize(); 
+	//cudaThreadSynchronize(); 
+        cudaDeviceSynchronize();
 	
 
 	functionKernel2<<< DIMGRID, DIMBLOCK, 0, stream1  >>>(d_b, N);
@@ -102,7 +103,9 @@ void checkDeviceProps(){
     cudaDeviceProp  prop;
     int whichDevice;
     HANDLER_ERROR_ERR( cudaGetDevice( &whichDevice ) );
+    printf("We are on device %d\n", whichDevice);
     HANDLER_ERROR_ERR( cudaGetDeviceProperties( &prop, whichDevice ) );
+    printf("prop.deviceOverlap: %d\n", prop.deviceOverlap);
     if (!prop.deviceOverlap) {
         printf( "Device will not handle overlaps, so no speed up from streams\n" );
     }
@@ -120,6 +123,11 @@ void test(){
 	
     // call device configuration
     onDevice(h_a, h_b);
+
+    printf("square:\n");
+    h_a.print();
+    printf("sin:\n");
+    h_b.print();
 
     // free host memory
     free(h_a.elements);
