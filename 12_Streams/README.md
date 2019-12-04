@@ -51,3 +51,5 @@ Ref: [GPUs in the Task Manager](https://devblogs.microsoft.com/directx/gpus-in-t
 A GPU engine represents an independent unit of silicon on the GPU that can be scheduled and 
 can operate in parallel with one another. GPU engines are made up of GPU cores.
 ```
+
+![image](https://github.com/keineahnung2345/CUDA_by_practice/blob/note/12_Streams/GPU_engine_cores.png)
