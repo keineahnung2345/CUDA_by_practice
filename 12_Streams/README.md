@@ -18,3 +18,18 @@ Ref: [FSB](https://www.computerhope.com/jargon/f/fsb.htm)
 Short for front-side bus, FSB is also known as the processor bus, memory bus, or system bus and 
 connects the CPU (chipset) with the main memory and L2 cache.
 ```
+
+## memory mapping
+Ref: [What is Memory mapping?](http://ecomputernotes.com/fundamental/input-output-and-memory/memory-mapping)
+
+```
+Memory mapping is the translation between the logical address space and the physical memory.
+```
+
+## PCI express bus
+Ref: [Peripheral Component Interconnect Express (PCIe, PCI-E)](https://searchdatacenter.techtarget.com/definition/PCI-Express)
+
+```
+Peripheral Component Interconnect Express (PCIe or PCI-E) is a serial expansion bus standard for 
+connecting a computer to one or more peripheral devices.
+```
