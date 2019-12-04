@@ -3,6 +3,16 @@
 ## pageable host memory
 Ref: [Paging in Operating System](https://www.geeksforgeeks.org/paging-in-operating-system/)
 
+## page-locked memory
+Ref: [CUDA Pinned memory](http://www.orangeowlsolutions.com/archives/443)
+```
+Page-locked (pinned) memory enables a DMA on the GPU to request transfers to and from the host memory 
+without the involvement of the CPU. 
+
+Locked memory is stored in the physical memory (RAM), so the GPU (or device, in the language of GPGPU)
+can fetch it without the help of the host (synchronous copy).
+```
+
 ## directory memory access(DMA)
 Ref: [Direct Memory Access (DMA)](https://www.techopedia.com/definition/2767/direct-memory-access-dma)
 
