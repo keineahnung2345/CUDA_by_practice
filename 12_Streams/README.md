@@ -43,3 +43,11 @@ Ref: [Peripheral Component Interconnect Express (PCIe, PCI-E)](https://searchdat
 Peripheral Component Interconnect Express (PCIe or PCI-E) is a serial expansion bus standard for 
 connecting a computer to one or more peripheral devices.
 ```
+
+## GPU engine
+Ref: [GPUs in the Task Manager](https://devblogs.microsoft.com/directx/gpus-in-the-task-manager/)
+
+```
+A GPU engine represents an independent unit of silicon on the GPU that can be scheduled and 
+can operate in parallel with one another. GPU engines are made up of GPU cores.
+```
