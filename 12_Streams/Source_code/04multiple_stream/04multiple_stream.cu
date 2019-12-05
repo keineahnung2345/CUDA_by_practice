@@ -178,3 +178,17 @@ int main(){
 	test();
 
 }
+
+/*
+Time 1:  891.188171 ms
+Time 2:  893.578186 ms
+Total time 1784.766357 ms
+
+Time 1:  904.204895 ms
+Time 2:  888.180603 ms
+Total time 1792.385498 ms
+
+Time 1:  894.391418 ms
+Time 2:  921.913147 ms
+Total time 1816.304565 ms
+*/
