@@ -169,3 +169,8 @@ int main(){
 	test();
 
 }
+
+/*
+result when not disabling fma:
+Time :  0.166560 ms
+*/
