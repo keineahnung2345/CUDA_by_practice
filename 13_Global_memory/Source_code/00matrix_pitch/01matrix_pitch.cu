@@ -75,11 +75,23 @@ void onDevice(Matrix<int> h_a, Matrix<int> h_b){
     // -*- [Pitch Allocation] -*-
     // allocate  memory on the GPU
 
+        //https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1g32bd7a39135594788a542ae72217775c
+        /*
+        __host__​cudaError_t cudaMallocPitch ( void** devPtr, size_t* pitch, size_t width, size_t height )
+        Allocates pitched memory on the device.
+        Allocates at least width (in bytes) * height bytes of linear memory on the device and returns in *devPtr a pointer to the allocated memory. The function may pad the allocation to ensure that corresponding pointers in any given row will continue to meet the alignment requirements for coalescing as the address is updated from row to row. The pitch returned in *pitch by cudaMallocPitch() is the width in bytes of the allocation. The intended usage of pitch is as a separate parameter of the allocation, used to compute addresses within the 2D array. Given the row and column of an array element of type T, the address is computed as:
+
+‎    T* pElement = (T*)((char*)BaseAddress + Row * pitch) + Column;
+        */
+        //d_a.width * sizeof(int): the width needed in bytes
+        //pitchA: the allocated width in bytes
 	HANDLER_ERROR_ERR(cudaMallocPitch((void **)(&d_a.elements), &pitchA, d_a.width * sizeof(int), d_a.height));
 	HANDLER_ERROR_ERR(cudaMallocPitch((void **)(&d_b.elements), &pitchB, d_b.width * sizeof(int), d_b.height));
 	printf("pitch = %li\n", pitchA/sizeof(int) );
 
 	//copy from host memory to device
+        //http://yzhu84.blogspot.com/2012/05/cudamallocpitch-and-cudamemcpy2d.html
+        //here should use cudaMemcpy2D() instead?
 	HANDLER_ERROR_ERR(cudaMemcpy(d_a.elements, h_a.elements, ARRAY_BYTES, cudaMemcpyHostToDevice));
 	HANDLER_ERROR_ERR(cudaMemcpy(d_b.elements, h_b.elements, ARRAY_BYTES, cudaMemcpyHostToDevice));
 
@@ -166,3 +178,12 @@ int main(){
 	onHost();
 }
 
+/*
+pitch = 1024
+Time Device pitch:  128.752060 ms
+Time Device threads and blocks:  128.749695 ms
+-: successful execution :-
+*/
+//Ref to:
+//https://devtalk.nvidia.com/default/topic/1010074/cuda-programming-and-performance/bad-performance-using-mallocpitch-and-memcpy2d/post/5153032/#5153032
+//:pitched allocation is useful on early GPU, but are of less significance on modern GPUs
