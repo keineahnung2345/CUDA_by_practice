@@ -62,6 +62,6 @@ result would have to be computed as rn(rn(X × Y ) + Z) with two rounding steps,
 one for add. Because the FMA uses only a single rounding step the result is computed more accurately.
 ```
 
-Ref: [Different results for CUDA addition on host and on GPU](https://stackoverflow.com/questions/14406364/different-results-for-cuda-addition-on-host-and-on-gpu)
+Ref: [Different results for CUDA addition on host and on GPU](https://stackoverflow.com/questions/14406364/different-results-for-cuda-addition-on-host-and-on-gpu) and [Accuracy in GPU floating point calculations](https://devtalk.nvidia.com/default/topic/476419/cuda-programming-and-performance/accuracy-in-gpu-floating-point-calculations/post/3397972/#3397972)
 
 Use `__fadd_rn` instead of `+`, `__fmul_rn` instead of `*`, `__sinf` instead of `sinf`, so the result of the GPU will be closer to that of the host.
