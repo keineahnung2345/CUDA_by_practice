@@ -104,3 +104,21 @@ void test(){
 int main( void ) {
     test();
 }
+
+/*
+Time using cudaMalloc:  39.6 ms
+
+	MB/s during copy up:  10111.4
+
+Time using cudaMalloc:  45.9 ms
+
+	MB/s during copy down:  8719.8
+
+Time using cudaHostAlloc:  33.4 ms
+
+	MB/s during copy up:  11967.9
+
+Time using cudaHostAlloc:  33.2 ms
+
+	MB/s during copy down:  12044.4
+*/
