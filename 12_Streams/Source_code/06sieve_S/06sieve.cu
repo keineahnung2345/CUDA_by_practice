@@ -15,8 +15,12 @@ __global__ void kernelSieve(int k, Vector<int> d_a)
 	while(i < ARRAY_SIZE)
 	{
 		if(k*k <= i)
+                //the check starts from k*k, 
+                //because k*1 is the multiple of 1, k*2 is the multiple of 2, ..., and k*(k-1) is the multiple of k-1,
+                //they are all checked in previous iterations
 		{
 			if(i%k == 0)
+                        //k's multiples are marked
 				d_a.setElement(i, MARK);
 		}
 		i+=blockDim.x*gridDim.x;
@@ -63,6 +67,8 @@ void onHost(){
 	onDevice(h_a);
 	
 	for(j=0; j<ARRAY_SIZE; j++){
+                //h_a.getElement(0) is 0 and h_a.getElement(1) is 1 so they are passed
+                //composite numbers are also passed because they are marked as MARK=1
 		if(h_a.getElement(j) > 1)
 			printf("%i \n", h_a.getElement(j));
 	}
