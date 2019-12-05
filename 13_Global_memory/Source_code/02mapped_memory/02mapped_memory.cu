@@ -70,9 +70,20 @@ void onDevice(Vector<float> h_a, Vector<float> h_b)
 	GpuTimer timer;
     timer.Start(stream1);
 
+        /*
+        __host__cudaError_t cudaHostGetDevicePointer ( void** pDevice, void* pHost, unsigned int  flags )
+        Passes back device pointer of mapped host memory allocated by cudaHostAlloc or registered by cudaHostRegister.
+        Parameters
+        pDevice
+            - Returned device pointer for mapped memory
+        pHost
+            - Requested host pointer mapping
+        flags
+            - Flags for extensions (must be 0 for now)
+        */
 	HANDLER_ERROR_ERR(cudaHostGetDevicePointer(&d_a.elements, h_a.elements,0));
 	HANDLER_ERROR_ERR(cudaHostGetDevicePointer(&d_b.elements, h_b.elements,0));
-
+        //Note that there is no cudaMalloc and cudaMemcpy here!!
 
 	functionKernel1<<< DIMGRID, DIMBLOCK , 0, stream1 >>>(d_a, FULL_DATA_SIZE);
 	HANDLER_ERROR_MSG("kernel panic!!!"); 	
@@ -153,3 +164,9 @@ int main(){
 	test();
 
 }
+
+/*
+Device test passed
+Time :  166.879807 ms
+-: successful execution :-
+*/
