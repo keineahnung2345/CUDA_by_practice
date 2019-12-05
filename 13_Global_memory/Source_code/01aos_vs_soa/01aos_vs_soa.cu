@@ -255,4 +255,10 @@ int main(){
 	test();
 }
 
+/*
+SOA on Host took 465.954987 ms.
+AOS on Host took 529.968018 ms.
 
+SOA on Device took 59.330688 ms.
+AOS on Device took 62.631104 ms.
+*/
