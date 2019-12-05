@@ -58,7 +58,7 @@ __global__ void functionKernel2( Vector<float> d_a, int n)
 }
 
 
-void onDevice(Vector<float> h_a, Vector<float> h_b)
+void onDevice(Vector<float> h_a, Vector<float> h_b, bool async)
 {
 	   
 	Vector<float> d_a, d_b;
@@ -76,8 +76,7 @@ void onDevice(Vector<float> h_a, Vector<float> h_b)
 
 
     for (int i=0; i<FULL_DATA_SIZE; i+= N) {
-
-
+        if(async){
 		// copy the locked memory to the device, async
 		HANDLER_ERROR_ERR( cudaMemcpyAsync(  d_a.elements, h_a.elements+i, ARRAY_BYTES,
 		    	 							cudaMemcpyHostToDevice, stream1 ) );
@@ -85,7 +84,10 @@ void onDevice(Vector<float> h_a, Vector<float> h_b)
 		// copy the locked memory to the device, async
 		HANDLER_ERROR_ERR( cudaMemcpyAsync( d_b.elements, h_b.elements+i, ARRAY_BYTES,
 		    	 							cudaMemcpyHostToDevice, stream1 ) );
-
+        }else{
+		HANDLER_ERROR_ERR(cudaMemcpy(d_a.elements, h_a.elements+i, ARRAY_BYTES, cudaMemcpyHostToDevice));
+		HANDLER_ERROR_ERR(cudaMemcpy(d_b.elements, h_b.elements+i, ARRAY_BYTES, cudaMemcpyHostToDevice));	
+        }
 
 		functionKernel1<<< DIMGRID, DIMBLOCK , 0, stream1 >>>(d_a, N);
 		HANDLER_ERROR_MSG("kernel panic!!!"); 	
@@ -94,25 +96,23 @@ void onDevice(Vector<float> h_a, Vector<float> h_b)
 		functionKernel2<<< DIMGRID, DIMBLOCK, 0, stream1  >>>(d_b, N);
 		HANDLER_ERROR_MSG("kernel panic!!!");
 
+        if(async){
 
-		/*
-		HANDLER_ERROR_ERR(cudaMemcpy(h_a.elements, d_a.elements, ARRAY_BYTES, cudaMemcpyDeviceToHost));
-		HANDLER_ERROR_ERR(cudaMemcpy(h_b.elements, d_b.elements, ARRAY_BYTES, cudaMemcpyDeviceToHost));	
-		*/
-
-
-	    // copy the locked memory to the device, async
+	    // copy from the device to the locked memory, async
 	    HANDLER_ERROR_ERR( cudaMemcpyAsync( h_a.elements+i, d_a.elements, ARRAY_BYTES,
 	    	 							cudaMemcpyDeviceToHost, stream1 ) );
 
 	    HANDLER_ERROR_ERR( cudaMemcpyAsync( h_b.elements+i, d_b.elements, ARRAY_BYTES,
 	    	 							cudaMemcpyDeviceToHost, stream1 ) );
-
+        }else{
+		HANDLER_ERROR_ERR(cudaMemcpy(h_a.elements+i, d_a.elements, ARRAY_BYTES, cudaMemcpyDeviceToHost));
+		HANDLER_ERROR_ERR(cudaMemcpy(h_b.elements+i, d_b.elements, ARRAY_BYTES, cudaMemcpyDeviceToHost));	
+        }
 
     }
 
     // synchronization
-    HANDLER_ERROR_ERR( cudaStreamSynchronize( stream1 ) );
+    if(async) HANDLER_ERROR_ERR( cudaStreamSynchronize( stream1 ) );
 
 
     // stop timer
@@ -139,6 +139,9 @@ void checkDeviceProps(){
     if (!prop.deviceOverlap) {
         printf( "Device will not handle overlaps, so no speed up from streams\n" );
     }
+    printf("deviceOverlap: %d\n", prop.deviceOverlap);
+    printf("asyncEngineCount: %d\n", prop.asyncEngineCount);
+    printf("concurrentKernels: %d\n", prop.concurrentKernels);
 }
 
 
@@ -165,7 +168,8 @@ void test(){
     }
 
     // call device configuration
-    onDevice(h_a, h_b);
+    onDevice(h_a, h_b, true);
+    //onDevice(h_a, h_b, false);
 
     /* Not used because of the cudaHostAlloc
     free(h_a.elements);
@@ -190,3 +194,15 @@ int main(){
 	test();
 
 }
+
+/*
+deviceOverlap: 1
+asyncEngineCount: 2
+concurrentKernels: 1
+
+async:
+Time :  1638.700806 ms
+
+not async:
+Time :  6107.161133 ms
+*/
