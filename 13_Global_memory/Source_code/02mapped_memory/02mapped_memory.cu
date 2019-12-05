@@ -99,8 +99,9 @@ void onDevice(Vector<float> h_a, Vector<float> h_b)
 
     // print time
     printf( "Time :  %f ms\n", timer.Elapsed() );
-	
 
+	//Note that there is no cudaFree here!!
+	
 	//destroy stream
 	HANDLER_ERROR_ERR(cudaStreamDestroy(stream1));	
 	
