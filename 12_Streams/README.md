@@ -53,3 +53,15 @@ can operate in parallel with one another. GPU engines are made up of GPU cores.
 ```
 
 ![image](https://github.com/keineahnung2345/CUDA_by_practice/blob/note/12_Streams/GPU_engine_cores.png)
+
+## Fused Multiply-Add (FMA)
+Ref: [Precision & Performance: Floating Point and IEEE 754 Compliance for NVIDIA GPUs - Chapter 2.3](https://developer.download.nvidia.com/assets/cuda/files/NVIDIA-CUDA-Floating-Point.pdf)
+```
+The FMA operation computes rn(X × Y + Z) with only one rounding step. Without the FMA operation the 
+result would have to be computed as rn(rn(X × Y ) + Z) with two rounding steps, one for multiply and 
+one for add. Because the FMA uses only a single rounding step the result is computed more accurately.
+```
+
+Ref: [Different results for CUDA addition on host and on GPU](https://stackoverflow.com/questions/14406364/different-results-for-cuda-addition-on-host-and-on-gpu)
+
+Use `__fadd_rn` instead of `+`, `__fmul_rn` instead of `*`, `__sinf` instead of `sinf`, so the result of the GPU will be closer to that of the host.
