@@ -5,7 +5,7 @@
 #include "common/Vector.h"
 
 #define THREADS 2
-#define N   (32)
+#define N   (320000)
 
 const int ARRAY_BYTES = N * sizeof(float);
 const int ARRAY_BYTES_H = N/THREADS * sizeof(float);
@@ -63,7 +63,8 @@ void addMutiple(Vector<float> h_a, Vector<float> h_b, Vector<float> h_mout){
     }
 
 	pthread_t threads[THREADS];
-
+        CpuTimer timer;
+        timer.Start();
 	for (int i=0;i<THREADS;i++)
 		pthread_create(&threads[i], NULL, threadRoutine, &(data[i]) );
 
@@ -73,18 +74,26 @@ void addMutiple(Vector<float> h_a, Vector<float> h_b, Vector<float> h_mout){
 	for(int i = 0; i < data[0].size; i++)
 		h_mout.elements[i]  = data[0].out[i];
 
-	for(int i = 16, j = 0; i < data[1].size*2; i++, j++)
+	for(int i = N/THREADS, j = 0; i < data[1].size*2; i++, j++)
 		h_mout.elements[i]  = data[1].out[j];
+
+        timer.Stop();
+        printf("multiple: %lf\n", timer.Elapsed());
+        
 
 }
 
 
 void addSingle(Vector<float> h_a, Vector<float> h_b, Vector<float> h_sout){
 
+        CpuTimer timer;
+        timer.Start();
 	for(int i = 0; i < N; i++){
 
 		h_sout.setElement(i, h_a.getElement(i) + h_b.getElement(i));
 	}
+        timer.Stop();
+        printf("single: %lf\n", timer.Elapsed());
 
 }
 
@@ -125,3 +134,21 @@ int main( void ) {
 		run();
     	return 0;
 }
+
+/*
+N:32
+single: 0.005000
+ThreadID = 0 
+ThreadID = 1 
+multiple: 0.389000
+-: successful execution :-
+*/
+
+/*
+N: 320000
+single: 9.015000
+ThreadID = 0 
+ThreadID = 1 
+multiple: 7.818000
+-: successful execution :-
+*/
