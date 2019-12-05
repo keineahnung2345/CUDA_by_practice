@@ -169,3 +169,12 @@ int main(){
 	onHost();
 
 }
+
+// about 50ms faster than 04multiple_stream
+/*
+Total time 1743.804565 ms
+
+Total time 1779.992554 ms
+
+Total time 1724.217285 ms
+*/
