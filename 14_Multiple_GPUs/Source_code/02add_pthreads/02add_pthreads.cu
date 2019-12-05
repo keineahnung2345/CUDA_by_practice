@@ -103,8 +103,8 @@ void run(){
 	Vector<float> h_a, h_b, h_sout, h_mout ;
     h_a.length = N;
     h_b.length = N;
-    h_sout.length = N/THREADS; 
-    h_mout.length = N/THREADS; 
+    h_sout.length = N; 
+    h_mout.length = N; 
 
 
     h_a.elements = (float*)malloc(  ARRAY_BYTES );
