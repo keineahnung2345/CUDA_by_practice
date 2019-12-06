@@ -212,3 +212,32 @@ int main( void ) {
         test();
     	return 0;
 }
+
+/*
+Number of GPUs 8, so 8 threads created 
+cpu_thread_id: 0
+cpu_thread_id: 1
+deviceID: 1
+cpu_thread_id: 7
+deviceID: 7
+cpu_thread_id: 3
+deviceID: 3
+cpu_thread_id: 2
+deviceID: 2
+cpu_thread_id: 6
+deviceID: 6
+cpu_thread_id: 4
+deviceID: 4
+cpu_thread_id: 5
+deviceID: 5
+Time :  4.889408 ms
+Time :  8.708480 ms
+Time :  22.168991 ms
+Time :  55.698177 ms
+Time :  45.742462 ms
+Time :  22.268353 ms
+Time :  26.453823 ms
+Time :  1.867840 ms
+Dot result = 32768.000000 
+-: successful execution :-
+*/
