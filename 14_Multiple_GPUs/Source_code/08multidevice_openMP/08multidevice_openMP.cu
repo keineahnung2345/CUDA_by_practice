@@ -3,6 +3,7 @@
 #include "common/Error.h"
 #include "common/Vector.h"
 #include "common/GpuTimer.h"
+#include <assert.h>
 
 #define N   (32 * 1024)  // (32768/2)=16384
 #define THREADS 256
@@ -60,6 +61,7 @@ void* onDevice( void *pvoidData ){
     
     DataStruct  *data = (DataStruct*)pvoidData;
     if (data->deviceID != 0) {
+        printf("deviceID: %d\n", data->deviceID);
         HANDLER_ERROR_ERR( cudaSetDevice( data->deviceID ) );
         HANDLER_ERROR_ERR( cudaSetDeviceFlags( cudaDeviceMapHost ) );
     }
@@ -146,19 +148,15 @@ void test(){
     }
 
     // prepare for multithread
-    DataStruct  data[2];
-    data[0].deviceID = 0;
-    data[0].offset = 0;
-    data[0].size = N/2;
-    data[0].a = h_a.elements;
-    data[0].b = h_b.elements;
+    DataStruct  data[num_gpus];
 
-    data[1].deviceID = 1;
-    data[1].offset = N/2;
-    data[1].size = N/2;
-    data[1].a = h_a.elements;
-    data[1].b = h_b.elements;
-
+    for(int i = 0; i < num_gpus; i++){
+        data[i].deviceID = i;
+        data[i].offset = N/num_gpus*i;
+        data[i].size = N/num_gpus;
+        data[i].a = h_a.elements;
+        data[i].b = h_b.elements;
+    }
     
     printf("Number of GPUs %d, so %d threads created \n", num_gpus, num_gpus );
     omp_set_num_threads(num_gpus);
@@ -166,14 +164,18 @@ void test(){
     {
         unsigned int cpu_thread_id = omp_get_thread_num();
         unsigned int num_cpu_threads = omp_get_num_threads();
-        
+        printf("cpu_thread_id: %d\n", cpu_thread_id);
         onDevice(&data[cpu_thread_id]);
 
     }
 
-    float finalValue=  data[0].returnValue + data[1].returnValue;
+    float finalValue = 0;
+    for(int i = 0; i < num_gpus; i++){
+        finalValue += data[i].returnValue; 
+    }
 
     printf( "Dot result = %f \n", finalValue);
+    assert(finalValue == N);
 
 
     printf("-: successful execution :-\n");
