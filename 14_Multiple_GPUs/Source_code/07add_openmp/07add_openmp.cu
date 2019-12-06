@@ -4,11 +4,11 @@
 #include "common/CpuTimer.h"
 #include "common/Vector.h"
 
-#define THREADS 2
-#define N   (32)
+#define THREADS 32
+#define N   (320000000)
 
 const int ARRAY_BYTES = N * sizeof(float);
-const int ARRAY_BYTES_H = N/THREADS * sizeof(float);
+const int ARRAY_BYTES_P = N/THREADS * sizeof(float);
 
 
 struct DataStruct{
@@ -45,25 +45,24 @@ void addMutiple(Vector<float> h_a, Vector<float> h_b, Vector<float> h_mout){
 
     // prepare for multithread
     DataStruct  data[THREADS];
-    data[0].threadID = 0;
-    data[0].size = N/THREADS;
-    data[0].a = h_a.elements;
-    data[0].b = h_b.elements;
-    data[0].out = (float*)malloc(  ARRAY_BYTES_H );
+    CpuTimer timer;
+    timer.Start();
 
-    data[1].threadID = 1;
-    data[1].size = N/THREADS;
-    data[1].a = h_a.elements + N/THREADS;
-    data[1].b = h_b.elements + N/THREADS;
-    data[1].out = (float*)malloc(  ARRAY_BYTES_H );	
-
-    for(int i = 0; i <  N /THREADS; i++){
-    		data[0].out[i] = 0;
-    		data[1].out[i]= 0;
+    for(int i = 0; i < THREADS; i++){
+        data[i].threadID = i;
+        data[i].size = N/THREADS;
+        data[i].a = h_a.elements + N/THREADS*i;
+        data[i].b = h_b.elements + N/THREADS*i;
+        data[i].out = (float*)malloc(  ARRAY_BYTES_P );
     }
 
+    for(int i = 0; i < THREADS; i++){
+        for(int j = 0; j <  N /THREADS; j++){
+            data[i].out[j] = 0;
+        }
+    }
 
-    omp_set_num_threads(2);
+    omp_set_num_threads(THREADS);
     #pragma omp parallel
     {
         unsigned int cpu_thread_id = omp_get_thread_num();
@@ -73,11 +72,14 @@ void addMutiple(Vector<float> h_a, Vector<float> h_b, Vector<float> h_mout){
 
     }
 
-	for(int i = 0; i < data[0].size; i++)
-		h_mout.elements[i]  = data[0].out[i];
+    for(int i = 0; i < THREADS; i++){
+        for(int j = 0; j < data[i].size; j++){
+            h_mout.elements[N/THREADS*i + j] = data[i].out[j];
+        }
+    }
 
-	for(int i = 16, j = 0; i < data[1].size*2; i++, j++)
-		h_mout.elements[i]  = data[1].out[j];
+    timer.Stop();
+    printf( "CPU Time :  %f ms\n", timer.Elapsed() );
 
 }
 
@@ -97,8 +99,8 @@ void run(){
 	Vector<float> h_a, h_b, h_sout, h_mout ;
     h_a.length = N;
     h_b.length = N;
-    h_sout.length = N/THREADS; 
-    h_mout.length = N/THREADS; 
+    h_sout.length = N; 
+    h_mout.length = N; 
 
 
     h_a.elements = (float*)malloc(  ARRAY_BYTES );
@@ -128,3 +130,16 @@ int main( void ) {
 		run();
     	return 0;
 }
+
+/*
+when N = 320000000
+
+THREADS = 1
+CPU Time :  1972.785889 ms
+
+THREADS = 2
+CPU Time :  1980.558960 ms
+
+THREADS = 32
+CPU Time :  2667.294922 ms
+*/
