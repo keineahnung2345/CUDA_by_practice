@@ -59,6 +59,7 @@ void* onDevice( void *pvoidData ){
     
     DataStruct  *data = (DataStruct*)pvoidData;
     if (data->deviceID != 0) {
+        //need to call cudaSetDevice and cudaSetDeviceFlags in the routine, too
         HANDLER_ERROR_ERR( cudaSetDevice( data->deviceID ) );
         HANDLER_ERROR_ERR( cudaSetDeviceFlags( cudaDeviceMapHost ) );
     }
@@ -83,7 +84,19 @@ void* onDevice( void *pvoidData ){
     HANDLER_ERROR_ERR(cudaHostGetDevicePointer(&d_b.elements, h_b.elements,0));
     HANDLER_ERROR_ERR(cudaMalloc((void**)&d_c.elements,P_ARRAY_BYTES));
 
-  // offset 'a' and 'b' to where this GPU is getting its data
+    /*
+    in test() we set:
+    data[1].a = h_a.elements;
+    data[1].b = h_b.elements;
+
+    and 
+
+    data[1].a = h_a.elements;
+    data[1].b = h_b.elements;
+    
+    so here we need to do offset manually
+    */
+    // offset 'a' and 'b' to where this GPU is getting its data
     d_a.elements += data->offset;
     d_b.elements += data->offset;
 
@@ -124,8 +137,14 @@ void test(){
     h_b.length = N;
 
 
+    //cudaSetDevice: initialize the device first
     HANDLER_ERROR_ERR( cudaSetDevice( 0 ) );
     HANDLER_ERROR_ERR( cudaSetDeviceFlags( cudaDeviceMapHost ) );
+    /*
+    #define cudaHostAllocPortable 0x01
+    #define cudaHostAllocMapped 0x02
+    #define cudaHostAllocWriteCombined 0x04
+    */
     HANDLER_ERROR_ERR( cudaHostAlloc( (void**)&h_a.elements, ARRAY_BYTES,
                               cudaHostAllocWriteCombined |
                               cudaHostAllocPortable |
@@ -203,3 +222,18 @@ int main( void ) {
         test();
     	return 0;
 }
+
+/*
+Time :  0.607712 ms
+Time :  0.648256 ms
+Dot result = 32768.000000 
+-: successful execution :-
+*/
+
+/*
+compare to 04multidevice:
+Time :  1.943776 ms
+Time :  2.574656 ms
+Dot result = 32768.000000 
+-: successful execution :-
+*/
