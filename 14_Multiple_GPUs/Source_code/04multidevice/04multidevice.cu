@@ -22,9 +22,12 @@ struct DataStruct {
 __global__ void dotKernel( Vector<float> d_a, Vector<float> d_b, Vector<float> d_c, int size ){
 
     __shared__ float cache[THREADS];
+    //used to index the whole grid
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    //used to index "cache", same size as a block
     int cacheIndex = threadIdx.x;
 
+    //move the grid of size THREADS*BLOCKS through the whole array of length size(=PARTIAL_ARRAY_SIZE)
     float   temp = 0;
     while (tid < size) {
         temp += d_a.getElement(tid) * d_b.getElement(tid);
@@ -36,7 +39,9 @@ __global__ void dotKernel( Vector<float> d_a, Vector<float> d_b, Vector<float> d
     
     // synchronize threads in this block
     __syncthreads();
-
+    // now all THREADS elements of cache are set
+    
+    // reduce THREADS elements of cache to cache[0]
     // for reductions, threadsPerBlock must be a power of 2
     // because of the following code
     int i = blockDim.x/2;
@@ -48,6 +53,9 @@ __global__ void dotKernel( Vector<float> d_a, Vector<float> d_b, Vector<float> d
         i /= 2;
     }
 
+    //"cache" is belong to a block
+    //every block calculates its dot value
+    //d_c's size is BLOCKS
     if (cacheIndex == 0)
         d_c.setElement(blockIdx.x, cache[0]);
 
@@ -57,6 +65,7 @@ __global__ void dotKernel( Vector<float> d_a, Vector<float> d_b, Vector<float> d
 void* onDevice( void *pvoidData ){
     
     DataStruct  *data = (DataStruct*)pvoidData;
+    //declare the device to use for this thread
     HANDLER_ERROR_ERR( cudaSetDevice( data->deviceID ) );
 
     const int PARTIAL_ARRAY_SIZE = data->size;
@@ -96,7 +105,6 @@ void* onDevice( void *pvoidData ){
     float partial = 0;
     for (int i=0; i<BLOCKS; i++) {
         partial += h_c.getElement(i);
-
     }
 
     // stop timer
@@ -147,8 +155,11 @@ void test(){
     data[1].a = h_a.elements + N/2;
     data[1].b = h_b.elements + N/2;
 
+    //"thread": responsible for data[0]
     CUTThread   thread = start_thread( onDevice, &(data[0]) );
+    //data[1]: not use a separate thread, but complete it in main thread
     onDevice( &(data[1]) );
+    //"thread": responsible for data[0]
     end_thread( thread );
 
 
@@ -180,3 +191,10 @@ int main( void ) {
         test();
     	return 0;
 }
+
+/*
+Time :  1.943776 ms
+Time :  2.574656 ms
+Dot result = 32768.000000 
+-: successful execution :-
+*/
